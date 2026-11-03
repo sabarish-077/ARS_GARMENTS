@@ -5,7 +5,7 @@ Vercel supports Django by detecting `manage.py`, loading the configured WSGI ent
 ## Required before production
 
 - **Plan:** ARS Garments is a commercial storefront. Vercel Hobby is limited to non-commercial personal use; use a plan permitted for business deployment.
-- **Git:** Connect a Git repository to Vercel. This checkout currently has no Git repository initialized.
+- **Git:** The `main` branch of `sabarish-077/ARS_GARMENTS` is pushed to GitHub. Vercel has detected it as an import candidate; import that repository with the project root set to the folder containing `manage.py`.
 - **Database:** Vercel cannot reach the MySQL server on your Windows computer. Provision managed MySQL that accepts a secure remote connection from the Vercel deployment. Create a least-privilege app account with `SELECT`, `INSERT`, `UPDATE`, and `DELETE` on `ars_garments`; use a separate migration account for schema changes.
 - **Secrets:** Add the following environment variables in Vercel Project Settings. Never commit `.env` or paste credential values into chat.
 
@@ -34,3 +34,7 @@ Vercel supplies `VERCEL_URL`; settings add that deployment host and its HTTPS or
 5. Create a Django superuser against the production database, open `/account/login/`, then verify `/dashboard/`, catalog, checkout, contact forms, and static images on the deployed domain.
 
 Vercel runs the Django app as a Function; production behavior and database access must be checked on the deployed environment. Do not treat a successful build as proof that the external database credentials or migrations work.
+
+## Vercel build dependency
+
+The project uses PyMySQL as Django's MySQLdb-compatible driver. Do not restore `mysqlclient`: Vercel's Python builder does not include the MySQL/MariaDB development libraries required to compile it. After changing dependencies, commit and push the changes, then redeploy from the connected GitHub branch.
