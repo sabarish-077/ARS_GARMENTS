@@ -1,0 +1,4 @@
+<article class="product-card h-100">
+  <a href="{{ product.get_absolute_url }}" class="product-image-link"><img src="{{ product.image_url|default:'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=800&q=85' }}" alt="{{ product.name }}" class="product-image" loading="lazy"><span class="product-tag">{{ product.category.name }}</span></a>
+  <div class="product-info"><p class="eyebrow mb-1">{{ product.material|truncatechars:34 }}</p><h3><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h3><p class="product-blurb">{{ product.short_description }}</p><div class="product-price"><strong>₹{{ product.price|floatformat:0 }}</strong>{% if product.compare_at_price %}<del>₹{{ product.compare_at_price|floatformat:0 }}</del>{% endif %}</div></div>
+</article>

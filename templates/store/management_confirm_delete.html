@@ -1,0 +1,3 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} | ARS Garments{% endblock %}
+{% block content %}<section class="container admin-form-wrap py-5"><div class="form-panel"><p class="eyebrow gold">DASHBOARD · CONFIRM</p><h1 class="page-title">{{ title }}?</h1><p>Are you sure you want to permanently delete <strong>{{ object }}</strong>?</p><form method="post">{% csrf_token %}<button class="btn btn-danger" type="submit">Yes, delete</button> <a class="btn btn-outline-dark" href="{% url return_route %}">Cancel</a></form></div></section>{% endblock %}

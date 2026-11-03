@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Admin dashboard | ARS Garments{% endblock %}
+{% block content %}
+<section class="container-fluid admin-dashboard py-4 py-lg-5">
+  <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+    <div><p class="eyebrow gold mb-2">ARS GARMENTS · MANAGEMENT</p><h1 class="page-title mb-1">Admin dashboard</h1><p class="text-muted mb-0">Welcome, {{ request.user.get_full_name|default:request.user.username }}. Manage your store from here.</p></div>
+    <a class="btn btn-outline-dark" href="{% url 'home' %}">View storefront ↗</a>
+  </div>
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3"><div class="admin-stat"><span>PRODUCTS</span><strong>{{ product_count }}</strong><small>{{ active_product_count }} active</small></div></div>
+    <div class="col-6 col-xl-3"><div class="admin-stat"><span>CATEGORIES</span><strong>{{ category_count }}</strong><small>Catalog collections</small></div></div>
+    <div class="col-6 col-xl-3"><div class="admin-stat"><span>ORDERS</span><strong>{{ order_count }}</strong><small>{{ new_order_count }} awaiting confirmation</small></div></div>
+    <div class="col-6 col-xl-3"><div class="admin-stat"><span>ENQUIRIES · SUBSCRIBERS</span><strong>{{ inquiry_count }} · {{ subscriber_count }}</strong><small>Contact and newsletter</small></div></div>
+  </div>
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3"><a class="admin-action" href="{% url 'manage_product_add' %}"><span>＋</span><strong>Add product</strong><small>Create a catalog item</small></a></div>
+    <div class="col-6 col-lg-3"><a class="admin-action" href="{% url 'manage_products' %}"><span>▤</span><strong>Manage products</strong><small>View, edit, or delete</small></a></div>
+    <div class="col-6 col-lg-3"><a class="admin-action" href="{% url 'manage_categories' %}"><span>◇</span><strong>Categories</strong><small>Create and organize</small></a></div>
+    <div class="col-6 col-lg-3"><a class="admin-action" href="{% url 'manage_orders' %}"><span>▣</span><strong>Orders</strong><small>Review and update status</small></a></div>
+    <div class="col-6 col-lg-3"><a class="admin-action" href="{% url 'manage_inquiries' %}"><span>✉</span><strong>Enquiries</strong><small>View customer messages</small></a></div>
+    <div class="col-6 col-lg-3"><a class="admin-action" href="{% url 'manage_subscribers' %}"><span>◎</span><strong>Subscribers</strong><small>Manage mailing list</small></a></div>
+  </div>
+  <div class="admin-table-panel"><div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h4 mb-0">Recent orders</h2><a class="text-link" href="{% url 'manage_orders' %}">View all →</a></div>
+    <div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Order</th><th>Customer</th><th>Status</th><th>Total</th><th>Date</th></tr></thead><tbody>
+      {% for order in recent_orders %}<tr><td><a href="{% url 'manage_order_edit' order.pk %}">{{ order.order_number }}</a></td><td>{{ order.customer_name }}</td><td><span class="badge text-bg-light">{{ order.get_status_display }}</span></td><td>₹{{ order.total|floatformat:0 }}</td><td>{{ order.placed_at|date:"j M Y" }}</td></tr>{% empty %}<tr><td colspan="5" class="text-center text-muted py-4">No orders yet.</td></tr>{% endfor %}
+    </tbody></table></div>
+  </div>
+</section>
+{% endblock %}
