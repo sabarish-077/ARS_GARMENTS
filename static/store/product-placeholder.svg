@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-label="Product image coming soon">
+  <rect width="800" height="1000" fill="#efe4d3"/>
+  <circle cx="400" cy="410" r="190" fill="#f8f3eb" stroke="#c9a24b" stroke-width="4"/>
+  <path d="M330 300l-95 55 50 88 45-24v205h140V419l45 24 50-88-95-55-40 48h-60z" fill="#e2d5c3" stroke="#92733b" stroke-width="8" stroke-linejoin="round"/>
+  <text x="400" y="720" text-anchor="middle" fill="#24231f" font-family="Georgia,serif" font-size="34" letter-spacing="5">ARS GARMENTS</text>
+  <text x="400" y="770" text-anchor="middle" fill="#77736b" font-family="Arial,sans-serif" font-size="19" letter-spacing="3">PRODUCT IMAGE</text>
+</svg>

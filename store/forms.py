@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.utils.text import slugify
 from .models import Category, ContactInquiry, NewsletterSubscriber, Order, Product
 
 
@@ -13,16 +14,47 @@ class ProductManagementForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs.setdefault("class", "form-select" if isinstance(field.widget, forms.Select) else "form-control")
+        self.fields["image_url"].help_text = "Paste a public, direct image URL (https://...). Local file paths cannot be displayed by the live website."
+        self.fields["image_url"].widget.attrs["placeholder"] = "https://example.com/product-photo.jpg"
 
 
 class CategoryManagementForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ["name", "slug", "description"]
+        fields = ["name", "description"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values(): field.widget.attrs["class"] = "form-control"
+        self.fields["name"].help_text = "If this category already exists, choose it from the product form instead of adding it again. Its URL slug is generated automatically."
+
+    def clean_name(self):
+        name = self.cleaned_data["name"].strip()
+        duplicates = Category.objects.filter(name__iexact=name)
+        if self.instance.pk:
+            duplicates = duplicates.exclude(pk=self.instance.pk)
+        if duplicates.exists():
+            raise forms.ValidationError(
+                "This category already exists. Select it in the product form instead of adding a duplicate."
+            )
+        return name
+
+    def save(self, commit=True):
+        category = super().save(commit=False)
+        name_changed = category.pk and self.cleaned_data["name"] != self.initial.get("name")
+        if not category.slug or name_changed:
+            base_slug = slugify(category.name) or "category"
+            candidate = base_slug
+            suffix = 2
+            existing = Category.objects.exclude(pk=category.pk)
+            while existing.filter(slug=candidate).exists():
+                candidate = f"{base_slug}-{suffix}"
+                suffix += 1
+            category.slug = candidate
+        if commit:
+            category.save()
+            self.save_m2m()
+        return category
 
 
 class OrderManagementForm(forms.ModelForm):
