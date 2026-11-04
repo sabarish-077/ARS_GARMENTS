@@ -26,6 +26,7 @@
         <div class="nav-actions d-flex align-items-center gap-3 pb-3 pb-lg-0">
           <form class="nav-search d-flex" action="{% url 'catalog' %}" method="get"><label class="visually-hidden" for="nav-search">Search products</label><input id="nav-search" name="q" type="search" placeholder="Search the collection" value="{{ request.GET.q|default:'' }}"><button aria-label="Search" type="submit">⌕</button></form>
           {% if user.is_authenticated %}<a class="nav-account" href="{% url 'home' %}" aria-label="Your account">Hi, {{ user.first_name|default:user.username }}</a>{% else %}<a class="nav-account" href="{% url 'login' %}" aria-label="Sign in">Sign in</a>{% endif %}
+          <a class="nav-admin-login" href="{% url 'login' %}">Admin Login</a>
           <a class="bag-link" href="{% url 'cart' %}" aria-label="Shopping bag">BAG <span>{{ cart_count }}</span></a>
           {% if user.is_authenticated %}<form action="{% url 'logout' %}" method="post" class="m-0">{% csrf_token %}<button class="nav-account border-0 bg-transparent" type="submit">Sign out</button></form>{% endif %}
         </div>
