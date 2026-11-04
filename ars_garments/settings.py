@@ -2,6 +2,10 @@
 import os
 from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
+import pymysql
+
+# Django's MySQL backend imports the MySQLdb API; use PyMySQL's compatible shim.
+pymysql.install_as_MySQLdb()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
