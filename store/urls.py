@@ -45,6 +45,7 @@ urlpatterns = [
     path("dashboard/subscribers/<int:pk>/delete/", management.SubscriberDelete.as_view(), name="manage_subscriber_delete"),
     path("", views.home, name="home"),
     path("shop/", views.catalog, name="catalog"),
+    path("product-image/<int:pk>/", views.product_image, name="product_image"),
     path("product/<slug:slug>/", views.product_detail, name="product_detail"),
     path("cart/", views.cart, name="cart"),
     path("cart/add/<int:product_id>/", views.add_to_cart, name="add_to_cart"),

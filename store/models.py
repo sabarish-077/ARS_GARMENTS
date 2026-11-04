@@ -23,6 +23,8 @@ class Product(models.Model):
     description = models.TextField(blank=True)
     material = models.CharField(max_length=180, default="100% combed cotton")
     image_url = models.URLField(max_length=1000, blank=True)
+    image_data = models.BinaryField(blank=True, null=True, editable=False)
+    image_content_type = models.CharField(max_length=30, blank=True, editable=False)
     price = models.DecimalField(max_digits=9, decimal_places=2)
     compare_at_price = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
     stock = models.PositiveIntegerField(default=25)
@@ -32,6 +34,11 @@ class Product(models.Model):
     class Meta: ordering = ["-is_featured", "name"]
     def __str__(self): return self.name
     def get_absolute_url(self): return reverse("product_detail", args=[self.slug])
+    @property
+    def display_image_url(self):
+        if self.image_data:
+            return reverse("product_image", args=[self.pk])
+        return self.image_url or "/static/store/product-placeholder.svg"
 
 
 class Order(models.Model):

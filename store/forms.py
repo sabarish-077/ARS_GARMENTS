@@ -6,6 +6,12 @@ from .models import Category, ContactInquiry, NewsletterSubscriber, Order, Produ
 
 
 class ProductManagementForm(forms.ModelForm):
+    image_upload = forms.FileField(
+        required=False,
+        label="Upload product photo from this computer",
+        help_text="JPEG, PNG, or WebP. Maximum file size: 4 MB. Saved in the product database for Vercel persistence.",
+    )
+
     class Meta:
         model = Product
         exclude = ["created_at"]
@@ -13,9 +19,52 @@ class ProductManagementForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
-            field.widget.attrs.setdefault("class", "form-select" if isinstance(field.widget, forms.Select) else "form-control")
+            if isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs["class"] = "form-check-input"
+            else:
+                field.widget.attrs.setdefault("class", "form-select" if isinstance(field.widget, forms.Select) else "form-control")
         self.fields["image_url"].help_text = "Paste a public, direct image URL (https://...). Local file paths cannot be displayed by the live website."
         self.fields["image_url"].widget.attrs["placeholder"] = "https://example.com/product-photo.jpg"
+        self.order_fields([
+            "name", "slug", "sku", "category", "short_description", "description",
+            "material", "image_upload", "image_url", "price", "compare_at_price",
+            "stock", "is_active", "is_featured",
+        ])
+        self.fields["is_active"].label = "Active in storefront"
+        self.fields["is_active"].help_text = "Selected products can appear in the shop. Turn this off to hide a product."
+        self.fields["is_featured"].label = "Feature on homepage"
+        self.fields["is_featured"].help_text = "Selected products appear in the homepage featured collection when active."
+
+    def clean_image_upload(self):
+        upload = self.cleaned_data.get("image_upload")
+        if not upload:
+            return upload
+        if upload.size > 4 * 1024 * 1024:
+            raise forms.ValidationError("Choose an image smaller than 4 MB.")
+        signature = upload.read(12)
+        upload.seek(0)
+        if signature.startswith(b"\xff\xd8\xff"):
+            upload.detected_image_type = "image/jpeg"
+        elif signature.startswith(b"\x89PNG\r\n\x1a\n"):
+            upload.detected_image_type = "image/png"
+        elif signature.startswith(b"RIFF") and signature[8:12] == b"WEBP":
+            upload.detected_image_type = "image/webp"
+        else:
+            raise forms.ValidationError("Use a valid JPEG, PNG, or WebP image file.")
+        upload.seek(0)
+        return upload
+
+    def save(self, commit=True):
+        product = super().save(commit=False)
+        upload = self.cleaned_data.get("image_upload")
+        if upload:
+            upload.seek(0)
+            product.image_data = upload.read()
+            product.image_content_type = upload.detected_image_type
+        if commit:
+            product.save()
+            self.save_m2m()
+        return product
 
 
 class CategoryManagementForm(forms.ModelForm):

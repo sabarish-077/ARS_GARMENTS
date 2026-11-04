@@ -5,12 +5,24 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import Q
 from django.core.exceptions import PermissionDenied
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from .forms import CheckoutForm, ContactForm, NewsletterForm, RegistrationForm
 from .models import Category, ContactInquiry, NewsletterSubscriber, Order, OrderItem, Product
 from .security import rate_limit
+
+
+def product_image(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    if not product.is_active and not request.user.is_staff:
+        raise Http404
+    if not product.image_data or product.image_content_type not in {"image/jpeg", "image/png", "image/webp"}:
+        raise Http404
+    response = HttpResponse(bytes(product.image_data), content_type=product.image_content_type)
+    response["X-Content-Type-Options"] = "nosniff"
+    response["Cache-Control"] = "public, max-age=3600"
+    return response
 
 
 def _cart_products(request):
