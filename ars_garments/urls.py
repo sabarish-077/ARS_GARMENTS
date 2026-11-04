@@ -1,8 +1,11 @@
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
-from django.http import HttpResponse
+from django.http import FileResponse, HttpResponse
 from django.urls import include, path
 from store.sitemaps import ProductSitemap, StaticViewSitemap
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 sitemaps = {
     "pages": StaticViewSitemap,
@@ -26,8 +29,14 @@ def robots_txt(request):
     )
     return HttpResponse(content, content_type="text/plain")
 
+
+def google_site_verification(request):
+    verification_file = BASE_DIR / "google56c3d4631336badb.html"
+    return FileResponse(verification_file.open("rb"), content_type="text/html")
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("google56c3d4631336badb.html", google_site_verification, name="google_site_verification"),
     path("robots.txt", robots_txt, name="robots_txt"),
     path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
     path("", include("store.urls")),
